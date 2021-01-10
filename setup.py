@@ -10,5 +10,6 @@ setup(
     name="modern-bencode",
     version="1.0.0",
     packages=["bencode"],
-    python_requires='>=3.7',
+    python_requires=">=3.7",
+    url="https://github.com/retonato/modern-bencode"
 )
