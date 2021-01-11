@@ -8,8 +8,9 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     name="modern-bencode",
-    version="1.0.1",
+    version="1.0.2",
     packages=["bencode"],
+    package_data={"bencode": ["py.typed"]},
     python_requires=">=3.7",
-    url="https://github.com/retonato/modern-bencode"
+    url="https://github.com/retonato/modern-bencode",
 )
