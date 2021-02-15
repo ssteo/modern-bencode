@@ -37,8 +37,9 @@ assert decode(b"li123e3:abce") == [123, b"abc"]
 assert encode([123, b"abc"]) == b"li123e3:abce"
 
 with open("my-torrent-file.torrent", "rb") as source_file:
-    print(decode(source_file.read()))
-    print(decode_torrent(source_file.read()))
+    torrent_data = source_file.read()
+    print(decode(torrent_data))
+    print(decode_torrent(torrent_data, encoding="utf8"))
 ```
 
 ## Notes
@@ -54,10 +55,15 @@ string before the end marker was found. Most likely the
 bencoded string is incomplete or incorrect.
 ```
 
-**bencode.decode_torrent** gets torrent file (as *bytes*), some 
+**bencode.decode_torrent** gets torrent file (as *bytes*), an optional 
 [encoding](https://docs.python.org/3.7/library/codecs.html#standard-encodings) 
 and:
-- either returns a Python *dict*
+- either returns a Python *dict*, where all keys and most values are strings.  
+  Fields, which are not supposed to be human readable ("ed2k", "filehash",  
+  "pieces"), are decoded as hex. Fields, which are supposed to be human  
+  readable, are decoded:
+  - using utf8 (if the key ends with ".utf-8" suffix, like "path.utf-8")
+  - using the provided encoding (in all other cases)
 - or raises UnicodeDecodeError/ValueError when decoding is not possible.
 
 **bencode.encode** gets a Python object (*bytes*, *dict*, *int* or *list*) and:
