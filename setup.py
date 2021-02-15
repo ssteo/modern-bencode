@@ -8,9 +8,10 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     name="modern-bencode",
-    version="1.0.2",
     packages=["bencode"],
     package_data={"bencode": ["py.typed"]},
     python_requires=">=3.7",
+    setup_requires=["setuptools_scm"],
     url="https://github.com/retonato/modern-bencode",
+    use_scm_version=True,
 )
