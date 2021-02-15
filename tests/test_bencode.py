@@ -111,3 +111,64 @@ def test_encode_unsupported_data_type():
     assert str(excinfo.value) == (
         "Cannot encode data: objects of type <class 'set'> are not supported."
     )
+
+
+def test_decode_torrent(datadir):
+    """Try to decode a torrent file"""
+    result = bencode.decode_torrent(
+        datadir["big-buck-bunny.torrent"].read("rb")
+    )
+    assert result["info"]["pieces"].startswith("2020a7789d")
+    result["info"]["pieces"] = []
+
+    assert result == {
+        "announce": "udp://tracker.leechers-paradise.org:6969",
+        "announce-list": [
+            ["udp://tracker.leechers-paradise.org:6969"],
+            ["udp://tracker.coppersurfer.tk:6969"],
+            ["udp://tracker.opentrackr.org:1337"],
+            ["udp://explodie.org:6969"],
+            ["udp://tracker.empire-js.us:1337"],
+            ["wss://tracker.btorrent.xyz"],
+            ["wss://tracker.openwebtorrent.com"],
+            ["wss://tracker.fastcast.nz"],
+        ],
+        "comment": "WebTorrent <https://webtorrent.io>",
+        "created by": "WebTorrent <https://webtorrent.io>",
+        "creation date": 1490916601,
+        "encoding": "UTF-8",
+        "info": {
+            "files": [
+                {"length": 140, "path": ["Big Buck Bunny.en.srt"]},
+                {"length": 276134947, "path": ["Big Buck Bunny.mp4"]},
+                {"length": 310380, "path": ["poster.jpg"]},
+            ],
+            "name": "Big Buck Bunny",
+            "piece length": 262144,
+            "pieces": [],
+        },
+        "url-list": ["https://webtorrent.io/torrents/"],
+    }
+
+
+def test_decode_torrent_unsupported_data_type():
+    """Try to decode unsupported object (a text string)"""
+    with pytest.raises(ValueError) as excinfo:
+        bencode.decode_torrent("abcd")
+
+    assert str(excinfo.value) == (
+        "Cannot decode data, expected bytes, got <class 'str'> instead."
+    )
+
+
+def test_decode_torrent_utf8_suffix():
+    """Dictionary keys, which have ".utf-8" suffix, should be decoded using
+    this encoding, even if another encoding is specified in the function call
+    """
+    special_string = "日本語"
+    special_string_as_bytes = special_string.encode("utf8")
+
+    data = {b"path.utf-8": special_string_as_bytes}
+    torrent = bencode.encode(data)
+
+    assert bencode.decode_torrent(torrent, "ascii") == {"path.utf-8": "日本語"}
