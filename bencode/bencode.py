@@ -13,13 +13,17 @@ START_LIST = ord("l")
 class BencodedString:
     """An internal container for bencoded strings"""
 
-    _data: bytes
-    current_index: int = 0
+    def __init__(self, data):
+        """Called when the object is created, sets its attributes"""
+        self.bytes = bytearray(data)
 
-    @property
-    def bytes(self):
-        """This property is used by all decoding code"""
-        return self._data[self.current_index :]  # noqa: E203
+    def del_prefix(self, index):
+        """Delete the prefix of specified length"""
+        del self.bytes[:index]
+
+    def get_prefix(self, index):
+        """Get the prefix of specified length (as bytes)"""
+        return bytes(self.bytes[:index])
 
 
 def _decode(data: BencodedString) -> Union[bytes, dict, int, list]:
@@ -75,9 +79,9 @@ def _decode_bytes(data: BencodedString) -> bytes:
     delimiter_index = data.bytes.find(COLON)
 
     if delimiter_index > 0:
-        length_prefix = data.bytes[:delimiter_index]
+        length_prefix = data.get_prefix(delimiter_index)
         string_length = int(length_prefix.decode("ascii"))
-        data.current_index += delimiter_index + 1
+        data.del_prefix(delimiter_index + 1)
     else:
         raise ValueError(
             "Cannot decode a byte string, it doesn't contain a delimiter. "
@@ -86,8 +90,8 @@ def _decode_bytes(data: BencodedString) -> bytes:
 
     # Get byte string data
     if len(data.bytes) >= string_length:
-        result_bytes = data.bytes[:string_length]
-        data.current_index += string_length
+        result_bytes = data.get_prefix(string_length)
+        data.del_prefix(string_length)
     else:
         raise ValueError(
             f"Cannot decode a byte string (prefix length "
@@ -111,7 +115,7 @@ def _decode_dict(data: BencodedString) -> dict:
         An extracted dictionary
     """
     result_dict = {}
-    data.current_index += 1
+    data.del_prefix(1)
 
     while True:
         if data.bytes:
@@ -120,7 +124,7 @@ def _decode_dict(data: BencodedString) -> dict:
                 value = _decode(data)
                 result_dict[key] = value
             else:
-                data.current_index += 1
+                data.del_prefix(1)
                 break
         else:
             raise ValueError(
@@ -144,12 +148,12 @@ def _decode_int(data: BencodedString) -> int:
     Returns:
         An extracted integer
     """
-    data.current_index += 1
+    data.del_prefix(1)
     end_marker_index = data.bytes.find(END_MARKER)
 
     if end_marker_index > 0:
-        result_bytes = data.bytes[:end_marker_index]
-        data.current_index += end_marker_index + 1
+        result_bytes = data.get_prefix(end_marker_index)
+        data.del_prefix(end_marker_index + 1)
     else:
         raise ValueError(
             "Cannot decode an integer, reached the end of the bencoded "
@@ -173,14 +177,14 @@ def _decode_list(data: BencodedString) -> list:
         An extracted list
     """
     result_list = []
-    data.current_index += 1
+    data.del_prefix(1)
 
     while True:
         if data.bytes:
             if data.bytes[0] != END_MARKER:
                 result_list.append(_decode(data))
             else:
-                data.current_index += 1
+                data.del_prefix(1)
                 break
         else:
             raise ValueError(
