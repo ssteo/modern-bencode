@@ -20,3 +20,6 @@ mypy --cache-dir=/dev/null --ignore-missing-imports bencode tests setup.py
 
 echo "--Pylint--"
 pylint --score=no bencode tests setup.py
+
+# Clean up
+rm .coverage
