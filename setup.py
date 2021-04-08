@@ -5,6 +5,7 @@ with open("README.md", "r") as desc_file:
     long_description = desc_file.read()
 
 setup(
+    description="A simple bencode library",
     long_description=long_description,
     long_description_content_type="text/markdown",
     name="modern-bencode",
