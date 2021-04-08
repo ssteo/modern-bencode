@@ -1,4 +1,4 @@
-"""A library for working with bencoded data."""
+"""Code, which deals with bencoded data."""
 from dataclasses import dataclass
 from typing import Union
 
@@ -196,30 +196,6 @@ def _decode_list(data: BencodedString) -> list:
     return result_list
 
 
-def _decode_torrent(data, encoding):
-    """Replace bytes with strings in the provided Python object"""
-    if isinstance(data, bytes):
-        return data.decode(encoding)
-
-    if isinstance(data, dict):
-        result_dict = {}
-        for key, value in data.items():
-            decoded_key = _decode_torrent(key, encoding)
-            if decoded_key.endswith(".utf-8"):
-                decoded_value = _decode_torrent(value, "utf8")
-            elif decoded_key in ["ed2k", "filehash", "pieces"]:
-                decoded_value = value.hex()
-            else:
-                decoded_value = _decode_torrent(value, encoding)
-            result_dict[decoded_key] = decoded_value
-        return result_dict
-
-    if isinstance(data, list):
-        return [_decode_torrent(item, encoding) for item in data]
-
-    return data
-
-
 def _encode_bytes(source: bytes) -> bytes:
     """Encode provided bytes as a bencoded string"""
     return str(len(source)).encode("ascii") + b":" + source
@@ -266,28 +242,6 @@ def decode(data: bytes) -> Union[bytes, dict, int, list]:
             f"Cannot decode data, expected bytes, got {type(data)} instead."
         )
     return _decode(BencodedString(data))
-
-
-def decode_torrent(data: bytes, encoding: str = "utf8") -> dict:
-    """Convert the given torrent from bencoded string to a Python object.
-
-    Fields, which are supposed to be human readable, are decoded:
-    - using utf8 (if the key ends with ".utf-8" suffix, like "path.utf-8")
-    - using the provided encoding (in all other cases)
-
-    Fields, which are not supposed to be human readable, are decoded as hex.
-    In most cases there is only one such field, "pieces".
-
-    Raises:
-        UnicodeDecodeError: If some key or value cannot be decoded using the
-            provided encoding
-        ValueError: If the first argument is not of type bytes
-    """
-    if not isinstance(data, bytes):
-        raise ValueError(
-            f"Cannot decode data, expected bytes, got {type(data)} instead."
-        )
-    return _decode_torrent(decode(data), encoding)
 
 
 def encode(data: Union[bytes, dict, int, list]) -> bytes:
