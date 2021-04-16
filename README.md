@@ -38,8 +38,8 @@ assert encode([123, b"abc"]) == b"li123e3:abce"
 with open("my-torrent-file.torrent", "rb") as source_file:
     data = source_file.read()
     print(decode(data))
-    print(decode_torrent(data, encoding="utf8"))
-    assert data == encode_torrent(decode_torrent(data, encoding="utf8"))
+    print(decode_torrent(data, encoding="utf8", errors="strict"))
+    assert data == encode_torrent(decode_torrent(data))
 ```
 
 ## Notes
@@ -68,7 +68,8 @@ Cannot encode data: objects of type <class 'set'> are not supported.
 
 **bencode.decode_torrent** converts torrent data to a Python object. It gets  
 torrent data (as *bytes*), an optional 
-[encoding](https://docs.python.org/3.7/library/codecs.html#standard-encodings) 
+[encoding](https://docs.python.org/3.7/library/codecs.html#standard-encodings),
+[error handler](https://docs.python.org/3/library/codecs.html#error-handlers)
 and:
 - either returns a Python *dict*, where all keys and most values are strings.  
   Values are decoded:
