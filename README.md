@@ -69,7 +69,7 @@ Cannot encode data: objects of type <class 'set'> are not supported.
 **bencode.decode_torrent** converts torrent data to a Python object. It gets  
 torrent data (as *bytes*), an optional 
 [encoding](https://docs.python.org/3.7/library/codecs.html#standard-encodings),
-[error handler](https://docs.python.org/3/library/codecs.html#error-handlers)
+an optional [error handler](https://docs.python.org/3/library/codecs.html#error-handlers)
 and:
 - either returns a Python *dict*, where all keys and most values are strings.  
   Values are decoded:
