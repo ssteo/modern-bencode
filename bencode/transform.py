@@ -5,7 +5,7 @@ def be_to_str(data: bytes) -> str:
     """Convert bencoded data from bytes to string"""
     result = []
     for num in data:
-        if num < 32 or num in [34, 39, 47, 91, 92, 93, 96, 127] or num > 127:
+        if num < 32 or num in [34, 91, 92, 93] or num > 126:
             result.append("[%0.2x]" % num)
         else:
             result.append(chr(num))
