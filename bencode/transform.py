@@ -5,6 +5,7 @@ def be_to_str(data: bytes) -> str:
     """Convert bencoded data from bytes to string"""
     result = []
     for num in data:
+        # Non-printable characters, double quotes, square brackets, accent
         if num < 32 or num in [34, 91, 92, 93] or num > 126:
             result.append("[%0.2x]" % num)
         else:
