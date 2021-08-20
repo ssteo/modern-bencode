@@ -53,7 +53,7 @@ with open("my-torrent-file.torrent", "rb") as source_file:
 **bencode.decode** converts bencoded data to a Python object. It gets *bytes*  
 and:
 - either returns a Python object (*bytes*, *dict*, *int* or *list*)
-- or raises a ValueError when decoding is not possible. The error message will  
+- or raises a ValueError when decoding is not possible. The error message will 
   contain a human readable explanation why exactly it is not possible, for 
   example:
 ```
