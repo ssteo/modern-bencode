@@ -11,7 +11,7 @@ There are other bencode related libraries out there, but most of them:
   - make debugging more complicated (if you get a "Segmentation fault" error)
 
 So, here is one more bencode library. Pluses:
-- it has an active maintainer
+- ~~it has an active maintainer~~
 - it has docs (both here and for all code) and human readable error messages
 - it has type annotations (so you can see what each function takes/returns)
 - it has 100% test coverage (+uses black, isort, flake8, mypy, pylint)
